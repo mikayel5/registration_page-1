@@ -4,6 +4,8 @@ import { NavLink } from 'react-router-dom';
 import Reset from './reset';
 import Input from '../../components/UI/Input/input';
 import is from 'is_js';
+import Loader from '../../components/UI/Loader/Loader'
+import axios from "axios";
 
 
 
@@ -11,6 +13,7 @@ export class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      // loading: true,
       isFormValid: false,
       formControls: {
         email: {
@@ -39,10 +42,22 @@ export class Login extends React.Component {
     }
   }
 
-  
-  loginHandler =()=>{
 
+  loginHandler = async() => {
+    const authData ={
+      email:this.state.formControls.email.value,
+      password: this.state.formControls.password.value,
+      returnSecureToken:true
+    }
+    try{
+      const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBRbb41yFWidO25NlQtZAZn3YRh6ycgU0Q',authData)
+      console.log(response.data)
+    } catch(e){
+      console.log(e)
+    }
   }
+
+
   submitHandler = event => {
     event.preventDefault()
   }
@@ -87,6 +102,7 @@ export class Login extends React.Component {
 
     this.setState({
       formControls, isFormValid
+      // ,loading:flase
     })
   }
 
@@ -109,7 +125,11 @@ export class Login extends React.Component {
     })
   }
 
-
+  componentDidMount() {
+    axios.get('https://registration-52db0.firebaseio.com/test.json').then(response => {
+      console.log(response)
+    })
+  }
   render() {
     return (
       <div className="form-container sign-in-container">
@@ -121,11 +141,18 @@ export class Login extends React.Component {
             <button className="bnt-social">in</button>
           </div>
           <span>or use your account</span>
+          {/* {
+            this.state.loading
+              ? <Loader />
+              :
+            } */}
+
           {this.renderInputs()}
+
           <NavLink to="/reset">Forgot your password?</NavLink>
-          <button 
-          type ="success"
-          onClick={this.loginHandler}
+          <button
+            type="success"
+            onClick={this.loginHandler}
           // disabled={!this.state.isFormValid}
           >Sign In</button>
         </form>
